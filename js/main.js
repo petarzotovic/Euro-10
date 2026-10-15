@@ -3,15 +3,17 @@
 
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* Vidljiva verzija sajta: desktop (.site-d) ili telefon (.site-m) */
+  function isVisible(el) { return !!(el && el.offsetParent !== null || (el && el.getClientRects().length)); }
+
   /* ---------- Hamburger meni (telefon) ---------- */
-  var ham = document.getElementById('ham');
-  var mnav = document.getElementById('mnav');
+  var ham = document.querySelector('.ham-m');
+  var mnav = document.getElementById('mnav-m');
   var closeT = null;
   function openMenu() {
     clearTimeout(closeT);
     mnav.hidden = false;
     mnav.classList.remove('closing');
-    mnav.classList.add('open');
     ham.setAttribute('aria-expanded', 'true');
     ham.setAttribute('aria-label', 'Zatvori meni');
   }
@@ -19,7 +21,6 @@
     if (!mnav || mnav.hidden) return;
     ham.setAttribute('aria-expanded', 'false');
     ham.setAttribute('aria-label', 'Otvori meni');
-    mnav.classList.remove('open');
     if (instant || reduceMotion) { mnav.hidden = true; return; }
     mnav.classList.add('closing');
     closeT = setTimeout(function () { mnav.hidden = true; mnav.classList.remove('closing'); }, 220);
@@ -28,14 +29,14 @@
     ham.addEventListener('click', function () {
       if (ham.getAttribute('aria-expanded') === 'true') closeMenu(false); else openMenu();
     });
-    window.addEventListener('resize', function () { if (window.innerWidth > 768) closeMenu(true); });
   }
 
   /* ---------- Glatko skrolovanje do sekcija ---------- */
   var raf = null;
-  function headerOffset() {
-    var h = document.querySelector('header');
-    return h ? h.offsetHeight : 0;
+  function visibleHeader() {
+    var hs = document.querySelectorAll('header');
+    for (var i = 0; i < hs.length; i++) if (hs[i].getClientRects().length) return hs[i];
+    return null;
   }
   function smoothTo(y) {
     if (raf) cancelAnimationFrame(raf);
@@ -54,39 +55,35 @@
   }
   document.addEventListener('click', function (e) {
     var a = e.target.closest('a[href^="#"]');
-    if (!a || a.id === 'logo-link') return;
-    var id = a.getAttribute('href').slice(1);
-    var el = id && document.getElementById(id);
-    if (!el) return;
-    e.preventDefault();
-    closeMenu(true);
-    smoothTo(el.getBoundingClientRect().top + (window.scrollY || 0) - headerOffset());
-    if (history.replaceState) history.replaceState(null, '', '#' + id);
-  });
-
-  /* ---------- Logo: osvežavanje stranice ---------- */
-  var logo = document.getElementById('logo-link');
-  if (logo) {
-    logo.addEventListener('click', function (e) {
+    if (!a) return;
+    if (a.classList.contains('logo-link')) {
       e.preventDefault();
       if (history.replaceState) history.replaceState(null, '', window.location.pathname);
       window.scrollTo(0, 0);
       window.location.reload();
-    });
-  }
+      return;
+    }
+    var id = a.getAttribute('href').slice(1);
+    var el = id && document.getElementById(id);
+    if (!el) return;
+    e.preventDefault();
+    var h = visibleHeader();
+    var top = el.getBoundingClientRect().top + (window.scrollY || 0) - (h ? h.offsetHeight : 0);
+    closeMenu(true);
+    smoothTo(top);
+  });
 
   /* ---------- Sat u hero sekciji ---------- */
-  var dial = document.querySelector('.dial');
-  var idle = document.querySelector('.needle-idle');
-  if (dial && idle) {
+  Array.prototype.forEach.call(document.querySelectorAll('.dial'), function (dial) {
+    var idle = dial.querySelector('.needle-idle');
+    if (!idle) return;
     var hover = false, t = null, iv = null;
     var setNeedle = function (deg, dur) {
       idle.style.transition = 'transform ' + dur + 's ease-in-out';
       idle.style.transform = 'rotate(' + deg + 'deg)';
     };
     var swing = function () {
-      var base = hover ? 50 : 0;
-      setNeedle(base + Math.round(Math.random() * 14 - 7), 3);
+      setNeedle((hover ? 50 : 0) + Math.round(Math.random() * 14 - 7), 3);
     };
     var startIdle = function () {
       clearTimeout(t); clearInterval(iv);
@@ -96,19 +93,21 @@
     dial.addEventListener('mouseenter', function () { hover = true; setNeedle(50, 2.4); startIdle(); });
     dial.addEventListener('mouseleave', function () { hover = false; setNeedle(0, 2.6); startIdle(); });
     startIdle();
-  }
+  });
 
   /* ---------- Recenzije: automatsko klizanje + prevlačenje ---------- */
-  var vp = document.querySelector('.rev-viewport');
-  var tr = document.querySelector('.rev-track');
-  if (vp && tr) {
+  Array.prototype.forEach.call(document.querySelectorAll('.rev-viewport'), function (vp) {
+    var tr = vp.querySelector('.rev-track');
+    if (!tr) return;
     var x = 0, drag = false, sx = 0, sx0 = 0, paused = false, last = performance.now(), resume = null;
     var loop = function (now) {
       var dt = Math.min(64, now - last); last = now;
-      if (!drag && !paused && !reduceMotion) x -= dt * 0.04;
-      var h = tr.scrollWidth / 2;
-      if (h > 0) { while (x <= -h) x += h; while (x > 0) x -= h; }
-      tr.style.transform = 'translateX(' + x + 'px)';
+      if (vp.getClientRects().length) {
+        if (!drag && !paused && !reduceMotion) x -= dt * 0.04;
+        var h = tr.scrollWidth / 2;
+        if (h > 0) { while (x <= -h) x += h; while (x > 0) x -= h; }
+        tr.style.transform = 'translateX(' + x + 'px)';
+      }
       requestAnimationFrame(loop);
     };
     var up = function () {
@@ -126,7 +125,7 @@
     vp.addEventListener('pointerup', up);
     vp.addEventListener('pointercancel', up);
     requestAnimationFrame(loop);
-  }
+  });
 
   /* ---------- Usluge na telefonu: kartice ---------- */
   var svc = Array.prototype.slice.call(document.querySelectorAll('.svc-card'));
