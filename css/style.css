@@ -95,6 +95,8 @@ body{margin:0;background:#FFFFFF}
 .e10 .c-lbl{font-size:14px;color:#B9CDE0;font-weight:600}
 .e10 .c-val{color:#FFFFFF;font-weight:700;text-decoration:none}
 .e10 .c-val:hover{color:#F5A3C0}
+.e10 .c-tel{font-family:'Archivo',sans-serif;font-weight:800;font-size:28px;line-height:1.25;color:#FFB3CE;letter-spacing:-.01em}
+.e10 .c-tel:hover{color:#FFFFFF}
 .e10 .fab{position:fixed;right:28px;bottom:28px;z-index:50;display:flex;align-items:center;gap:0;height:68px;min-width:68px;padding:0 21px;border-radius:999px;background:var(--pink);color:#FFFFFF;text-decoration:none;box-shadow:0 12px 30px rgba(199,42,98,.4);transition:background .2s ease,gap .3s ease}
 .e10 .fab:hover{background:#A9214F;color:#FFFFFF;gap:12px}
 .e10 .fab-txt{max-width:0;overflow:hidden;white-space:nowrap;font-weight:700;font-size:17px;transition:max-width .35s ease}
@@ -238,12 +240,14 @@ body{margin:0;background:#FFFFFF}
 @keyframes needle-rev-m{0%,100%{transform:rotate(0deg)}30%{transform:rotate(14deg)}55%{transform:rotate(5deg)}80%{transform:rotate(11deg)}}
 @media (prefers-reduced-motion:reduce){.m10 .needle,.m10 .needle-rev.on{animation:none}
 .m10 .needle-idle{transition:none !important}}
-.m10 .svc-stage{position:relative;height:290px;margin:14px -20px 0}
+.m10 .svc-stage{position:relative;height:290px;margin:14px -20px 0;touch-action:pan-y}
 .m10 .svc-card{position:absolute;top:0;left:50%;width:230px;min-height:262px;margin:0;text-align:left;font:inherit;color:var(--ink);background:#FFFFFF;border:1px solid var(--line);border-radius:22px;padding:24px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;cursor:pointer;box-shadow:0 8px 24px rgba(15,30,51,.10);transition:transform .6s cubic-bezier(.22,1,.36,1),box-shadow .6s ease,filter .6s ease;filter:brightness(.94)}
 .m10 .svc-card.on{cursor:default;filter:none;border-color:#B8C6D6;box-shadow:0 22px 50px rgba(15,30,51,.22)}
 .m10 .svc-title{font-family:'Archivo',sans-serif;font-weight:700;font-size:22px}
 .m10 .svc-text{font-size:16px;line-height:1.6;color:var(--muted)}
 .m10 .c-row{display:flex;gap:14px;align-items:center;padding:14px 0}
+.m10 .c-tel{font-family:'Archivo',sans-serif;font-weight:800;font-size:23px;line-height:1.2;color:#FFB3CE;letter-spacing:-.01em}
+.m10 .c-tel:hover{color:#FFFFFF}
 .m10 .c-panel .c-row + .c-row{border-top:1px solid rgba(255,255,255,.14)}
 .m10 .mnav{animation:menu-in-m .32s cubic-bezier(.22,1,.36,1) both;transform-origin:top}
 .m10 .mnav.out{animation:menu-out-m .22s ease-in both}

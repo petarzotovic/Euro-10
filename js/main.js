@@ -140,7 +140,26 @@
         c.setAttribute('aria-pressed', pos === 0 ? 'true' : 'false');
       });
     };
-    svc.forEach(function (c, i) { c.addEventListener('click', function () { active = i; layout(); }); });
+    var swiped = false;
+    svc.forEach(function (c, i) {
+      c.addEventListener('click', function () {
+        if (swiped) { swiped = false; return; }
+        active = i; layout();
+      });
+    });
+    /* prevlačenje prstom levo/desno */
+    var stage = svc[0].parentElement, x0 = null;
+    stage.style.touchAction = 'pan-y';
+    stage.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
+    stage.addEventListener('pointercancel', function () { x0 = null; });
+    stage.addEventListener('pointerup', function (e) {
+      if (x0 === null) return;
+      var dx = e.clientX - x0; x0 = null;
+      if (Math.abs(dx) < 40) return;
+      swiped = true; setTimeout(function () { swiped = false; }, 400);
+      active = (active + (dx < 0 ? 1 : 2)) % 3;
+      layout();
+    });
     layout();
   }
 })();
